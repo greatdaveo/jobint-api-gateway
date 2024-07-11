@@ -8,9 +8,10 @@ import cors from 'cors';
 import compression from 'compression';
 import { StatusCodes } from 'http-status-codes';
 import http from 'http';
+import { config } from '@gateway/config';
 
 const SERVER_PORT = 4000;
-const log: Logger = winstonLogger('http://localhost:9200', 'apiGatewayServer', 'debug');
+const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
 
 export class GatewayServer {
   private app: Application;
@@ -33,9 +34,9 @@ export class GatewayServer {
     app.use(
       cookieSession({
         name: 'jobint-session',
-        keys: [],
+        keys: [`${config.SECRET_KEY_ONE}`, `${config.SECRET_KEY_TWO}`],
         maxAge: 24 * 7 * 3600000, // For 7 days
-        secure: false // To be updated with value from config
+        secure: config.NODE_ENV !== 'development'
         // sameSite: none,
       })
     );
@@ -44,7 +45,7 @@ export class GatewayServer {
     app.use(helmet());
     app.use(
       cors({
-        origin: '',
+        origin: config.CLIENT_URL,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })

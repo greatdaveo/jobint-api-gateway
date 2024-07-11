@@ -9,6 +9,7 @@ import compression from 'compression';
 import { StatusCodes } from 'http-status-codes';
 import http from 'http';
 import { config } from '@gateway/config';
+import { elasticSearch } from '@gateway/elasticsearch';
 
 const SERVER_PORT = 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
@@ -61,7 +62,9 @@ export class GatewayServer {
 
   private routesMiddleware(_app: Application): void {}
 
-  private startElasticsearch(): void {}
+  private startElasticsearch(): void {
+    elasticSearch.checkConnection();
+  }
 
   private errorHandler(app: Application): void {
     // if an unknown endpoint is used, it will throw an error here
